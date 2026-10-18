@@ -63,3 +63,5 @@ Sistema de gestión para un negocio dedicado a la comercialización de plantas, 
 Tecnólogo en Análisis y Desarrollo de Software  
 SENA - Centro de Gestión de Mercados, Logística y Tecnologías de la Información  
 Agosto 2026
+
+Prueba de actualización remota
