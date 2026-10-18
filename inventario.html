@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventario - Jardinería El Edén</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: #f0f4f0; color: #1a2a3a; }
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background: #1a5e20; color: #fff; display: flex; flex-direction: column; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; }
+        .sidebar .brand { display: flex; align-items: center; gap: 12px; padding: 0 24px 25px; border-bottom: 1px solid rgba(255,255,255,0.10); margin-bottom: 15px; }
+        .sidebar .brand-icon { width: 42px; height: 42px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+        .sidebar .brand-text h2 { font-size: 1.15rem; font-weight: 700; line-height: 1.2; }
+        .sidebar .brand-text span { font-size: 0.75rem; opacity: 0.75; }
+        .sidebar nav { flex: 1; padding: 0 12px; }
+        .sidebar nav a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.92rem; border-radius: 8px; margin-bottom: 4px; transition: 0.2s; }
+        .sidebar nav a:hover { background: rgba(255,255,255,0.10); color: #fff; }
+        .sidebar nav a.active { background: rgba(255,255,255,0.18); color: #fff; font-weight: 600; }
+        .sidebar nav a .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+        .sidebar .logout { padding: 15px 24px 0; border-top: 1px solid rgba(255,255,255,0.10); margin-top: 10px; }
+        .sidebar .logout a { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; padding: 10px 0; }
+        .main-content { margin-left: 260px; flex: 1; padding: 25px 35px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .topbar h1 { font-size: 1.5rem; font-weight: 700; color: #1a2a3a; }
+        .topbar .subtitle { font-size: 0.9rem; color: #6a7b8c; margin-top: 2px; }
+        .btn-add-product { background: #2e7d32; color: #fff; padding: 12px 22px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-add-product:hover { background: #1a5e20; }
+        .search-bar { display: flex; gap: 12px; margin-bottom: 20px; }
+        .search-input-wrapper { flex: 1; position: relative; }
+        .search-input-wrapper .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #a0aeba; font-size: 1rem; }
+        .search-input-wrapper input { width: 100%; padding: 13px 16px 13px 44px; border: 1px solid #dce3ec; border-radius: 10px; font-size: 0.9rem; background: #fff; color: #1a2a3a; }
+        .filter-select { padding: 13px 40px 13px 16px; border: 1px solid #dce3ec; border-radius: 10px; font-size: 0.9rem; background: #fff; color: #1a2a3a; cursor: pointer; min-width: 140px; }
+        .table-container { background: #fff; border-radius: 14px; padding: 5px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        table th { text-align: left; font-size: 0.72rem; color: #7a8b9c; text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 20px; border-bottom: 1px solid #f0f4f0; font-weight: 700; }
+        table td { padding: 16px 20px; border-bottom: 1px solid #f0f4f0; color: #1a2a3a; vertical-align: middle; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #a0aeba; }
+        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
+        .empty-state .empty-title { font-size: 1rem; font-weight: 600; color: #7a8b9c; margin-bottom: 4px; }
+        .empty-state .empty-desc { font-size: 0.85rem; color: #a0aeba; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-success { background: #e8f5e9; color: #2e7d32; }
+        .badge-danger { background: #fdecea; color: #e74c3c; }
+        .btn-action {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-right: 5px;
+        }
+        .btn-edit { background: #e8f5e9; color: #2e7d32; }
+        .btn-edit:hover { background: #2e7d32; color: #fff; }
+        .btn-delete { background: #fdecea; color: #e74c3c; }
+        .btn-delete:hover { background: #e74c3c; color: #fff; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
+        .modal-overlay.visible { display: flex; }
+        .modal { background: #fff; border-radius: 14px; padding: 30px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .modal h2 { font-size: 1.3rem; color: #1a2a3a; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #4a5a6a; margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 11px 14px; border: 1px solid #dce3ec; border-radius: 8px; font-size: 0.9rem; color: #1a2a3a; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #2e7d32; box-shadow: 0 0 0 3px rgba(46,125,50,0.08); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-cancel { flex: 1; padding: 12px; background: #fff; color: #4a5a6a; border: 1px solid #dce3ec; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+        .btn-save { flex: 1; padding: 12px; background: #2e7d32; color: #fff; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+        .btn-save:hover { background: #1a5e20; }
+        @media (max-width: 900px) {
+            .sidebar { width: 70px; }
+            .sidebar .brand-text, .sidebar nav a span:not(.nav-icon), .sidebar .logout a span { display: none; }
+            .sidebar nav a { justify-content: center; padding: 12px; }
+            .main-content { margin-left: 70px; padding: 20px 15px; }
+            .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .search-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">🌿</div>
+                <div class="brand-text"><h2>Jardinería</h2><span>El Edén</span></div>
+            </div>
+            <nav>
+                <a href="dashboard.html"><span class="nav-icon">🏠</span><span>Inicio</span></a>
+                <a href="inventario.html" class="active"><span class="nav-icon">📦</span><span>Inventario</span></a>
+                <a href="alertas.html"><span class="nav-icon">🔔</span><span>Alertas</span></a>
+                <a href="facturacion.html"><span class="nav-icon">🧾</span><span>Facturación</span></a>
+                <a href="administracion.html"><span class="nav-icon">⚙️</span><span>Administración</span></a>
+            </nav>
+            <div class="logout">
+                <a href="login.html"><span class="nav-icon">🚪</span><span>Cerrar sesión</span></a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <div>
+                    <h1>Gestión de Inventario</h1>
+                    <div class="subtitle" id="contadorProductos">0 productos registrados</div>
+                </div>
+                <button class="btn-add-product" id="btnAgregar">+ Agregar Producto</button>
+            </div>
+
+            <div class="search-bar">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="buscador" placeholder="Buscar productos por nombre, categoría o código..." />
+                </div>
+                <select class="filter-select" id="filtroCategoria">
+                    <option value="Todas">Todas</option>
+                    <option value="Plantas">Plantas</option>
+                    <option value="Flores">Flores</option>
+                    <option value="Macetas">Macetas</option>
+                    <option value="Herramientas">Herramientas</option>
+                    <option value="Fertilizantes">Fertilizantes</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Stock Actual</th>
+                            <th>Stock Mínimo</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaProductos"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2 id="modalTitulo">Agregar Producto</h2>
+            <form id="formProducto">
+                <div class="form-group">
+                    <label>Código *</label>
+                    <input type="text" id="inputCodigo" placeholder="Ej: PLT-006" required />
+                </div>
+                <div class="form-group">
+                    <label>Nombre *</label>
+                    <input type="text" id="inputNombre" placeholder="Ej: Rosa Roja" required />
+                </div>
+                <div class="form-group">
+                    <label>Categoría *</label>
+                    <select id="inputCategoria" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="Plantas">Plantas</option>
+                        <option value="Flores">Flores</option>
+                        <option value="Macetas">Macetas</option>
+                        <option value="Herramientas">Herramientas</option>
+                        <option value="Fertilizantes">Fertilizantes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Stock Actual *</label>
+                    <input type="number" id="inputStock" min="0" placeholder="0" required />
+                </div>
+                <div class="form-group">
+                    <label>Stock Mínimo *</label>
+                    <input type="number" id="inputStockMin" min="0" placeholder="5" required />
+                </div>
+                <div class="form-group">
+                    <label>Precio *</label>
+                    <input type="number" id="inputPrecio" min="1" placeholder="0" required />
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="btnCancelar">Cancelar</button>
+                    <button type="submit" class="btn-save" id="btnGuardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Datos iniciales de productos (simula la base de datos MySQL)
+        const productosIniciales = [
+            { codigo: 'PLT-001', nombre: 'Rosa Roja Premium', categoria: 'Plantas', stock: 45, stockMin: 10, precio: 25000 },
+            { codigo: 'PLT-002', nombre: 'Orquídea Phalaenopsis', categoria: 'Plantas', stock: 8, stockMin: 5, precio: 85000 },
+            { codigo: 'PLT-003', nombre: 'Helecho Boston', categoria: 'Plantas', stock: 32, stockMin: 10, precio: 18000 },
+            { codigo: 'FLR-001', nombre: 'Ramo de Girasoles', categoria: 'Flores', stock: 3, stockMin: 5, precio: 35000 },
+            { codigo: 'FLR-002', nombre: 'Rosa Blanca', categoria: 'Flores', stock: 20, stockMin: 8, precio: 30000 },
+            { codigo: 'MAC-001', nombre: 'Maceta Terracota 20cm', categoria: 'Macetas', stock: 4, stockMin: 15, precio: 12000 },
+            { codigo: 'FER-001', nombre: 'Fertilizante NPK 500g', categoria: 'Fertilizantes', stock: 2, stockMin: 10, precio: 28000 },
+            { codigo: 'HER-001', nombre: 'Tijeras de Podar', categoria: 'Herramientas', stock: 25, stockMin: 8, precio: 45000 }
+        ];
+
+        // Cargar productos desde LocalStorage o usar los iniciales
+        function cargarProductos() {
+            const datos = localStorage.getItem('productos_el_eden');
+            if (datos) return JSON.parse(datos);
+            localStorage.setItem('productos_el_eden', JSON.stringify(productosIniciales));
+            return productosIniciales;
+        }
+
+        // Guardar productos en LocalStorage
+        function guardarProductos(lista) {
+            localStorage.setItem('productos_el_eden', JSON.stringify(lista));
+        }
+
+        // Estado global
+        let productos = cargarProductos();
+        let editandoCodigo = null;
+
+        // Referencias al DOM
+        const tablaProductos = document.getElementById('tablaProductos');
+        const buscador = document.getElementById('buscador');
+        const filtroCategoria = document.getElementById('filtroCategoria');
+        const contadorProductos = document.getElementById('contadorProductos');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalTitulo = document.getElementById('modalTitulo');
+        const formProducto = document.getElementById('formProducto');
+        const inputCodigo = document.getElementById('inputCodigo');
+        const inputNombre = document.getElementById('inputNombre');
+        const inputCategoria = document.getElementById('inputCategoria');
+        const inputStock = document.getElementById('inputStock');
+        const inputStockMin = document.getElementById('inputStockMin');
+        const inputPrecio = document.getElementById('inputPrecio');
+        const btnAgregar = document.getElementById('btnAgregar');
+        const btnCancelar = document.getElementById('btnCancelar');
+
+        // Renderizar los productos en la tabla
+        function renderProductos(lista) {
+            contadorProductos.textContent = lista.length + ' productos registrados';
+
+            if (lista.length === 0) {
+                tablaProductos.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-icon">📦</div>
+                                <div class="empty-title">No hay productos registrados</div>
+                                <div class="empty-desc">Haz clic en "Agregar Producto" para comenzar</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tablaProductos.innerHTML = lista.map(p => {
+                const badge = p.stock <= p.stockMin
+                    ? '<span class="badge badge-danger">Stock Bajo</span>'
+                    : '<span class="badge badge-success">Activo</span>';
+
+                return `
+                    <tr>
+                        <td>${p.codigo}</td>
+                        <td>${p.nombre}</td>
+                        <td>${p.categoria}</td>
+                        <td>${p.stock}</td>
+                        <td>${p.stockMin}</td>
+                        <td>$${p.precio.toLocaleString('es-CO')}</td>
+                        <td>${badge}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="editarProducto('${p.codigo}')">Editar</button>
+                            <button class="btn-action btn-delete" onclick="eliminarProducto('${p.codigo}')">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Filtrar productos por texto y categoría
+        function filtrarProductos() {
+            const texto = buscador.value.toLowerCase().trim();
+            const categoria = filtroCategoria.value;
+
+            const filtrados = productos.filter(p => {
+                const coincideTexto = p.nombre.toLowerCase().includes(texto) ||
+                                      p.codigo.toLowerCase().includes(texto) ||
+                                      p.categoria.toLowerCase().includes(texto);
+                const coincideCategoria = categoria === 'Todas' || p.categoria === categoria;
+                return coincideTexto && coincideCategoria;
+            });
+
+            renderProductos(filtrados);
+        }
+
+        // Abrir modal para agregar producto
+        btnAgregar.addEventListener('click', function() {
+            editandoCodigo = null;
+            modalTitulo.textContent = 'Agregar Producto';
+            formProducto.reset();
+            modalOverlay.classList.add('visible');
+            inputCodigo.focus();
+        });
+
+        // Abrir modal para editar producto
+        window.editarProducto = function(codigo) {
+            const producto = productos.find(p => p.codigo === codigo);
+            if (!producto) return;
+
+            editandoCodigo = codigo;
+            modalTitulo.textContent = 'Editar Producto';
+            inputCodigo.value = producto.codigo;
+            inputNombre.value = producto.nombre;
+            inputCategoria.value = producto.categoria;
+            inputStock.value = producto.stock;
+            inputStockMin.value = producto.stockMin;
+            inputPrecio.value = producto.precio;
+            modalOverlay.classList.add('visible');
+        };
+
+        // Eliminar producto con confirmación
+        window.eliminarProducto = function(codigo) {
+            if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+            productos = productos.filter(p => p.codigo !== codigo);
+            guardarProductos(productos);
+            renderProductos(productos);
+        };
+
+        // Guardar (agregar o editar) producto
+        formProducto.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const codigo = inputCodigo.value.trim().toUpperCase();
+            const nombre = inputNombre.value.trim();
+            const categoria = inputCategoria.value;
+            const stock = parseInt(inputStock.value);
+            const stockMin = parseInt(inputStockMin.value);
+            const precio = parseFloat(inputPrecio.value);
+
+            if (!codigo || !nombre || !categoria || isNaN(stock) || isNaN(stockMin) || isNaN(precio)) {
+                alert('Por favor completa todos los campos correctamente.');
+                return;
+            }
+
+            if (precio <= 0) {
+                alert('El precio debe ser mayor a 0.');
+                return;
+            }
+
+            if (editandoCodigo === null) {
+                if (productos.some(p => p.codigo === codigo)) {
+                    alert('Ya existe un producto con ese código.');
+                    return;
+                }
+                productos.push({ codigo, nombre, categoria, stock, stockMin, precio });
+            } else {
+                const index = productos.findIndex(p => p.codigo === editandoCodigo);
+                if (index !== -1) {
+                    productos[index] = { codigo, nombre, categoria, stock, stockMin, precio };
+                }
+            }
+
+            guardarProductos(productos);
+            renderProductos(productos);
+            cerrarModal();
+        });
+
+        // Cerrar el modal
+        function cerrarModal() {
+            modalOverlay.classList.remove('visible');
+            formProducto.reset();
+            editandoCodigo = null;
+        }
+
+        btnCancelar.addEventListener('click', cerrarModal);
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) cerrarModal();
+        });
+
+        // Eventos de búsqueda y filtro
+        buscador.addEventListener('input', filtrarProductos);
+        filtroCategoria.addEventListener('change', filtrarProductos);
+
+        // Inicializar la tabla
+        renderProductos(productos);
+    </script>
+
+</body>
+</html>

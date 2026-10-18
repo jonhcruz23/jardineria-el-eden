@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administración - Jardinería El Edén</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f0f4f0;
+            color: #1a2a3a;
+        }
+
+        /* ===== LAYOUT ===== */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            background: #1a5e20;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 24px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+            margin-bottom: 15px;
+        }
+
+        .sidebar .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .sidebar .brand-text h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .sidebar .brand-text span {
+            font-size: 0.75rem;
+            opacity: 0.75;
+        }
+
+        .sidebar nav {
+            flex: 1;
+            padding: 0 12px;
+        }
+
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 0.92rem;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: 0.2s;
+        }
+
+        .sidebar nav a:hover {
+            background: rgba(255, 255, 255, 0.10);
+            color: #fff;
+        }
+
+        .sidebar nav a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .sidebar nav a .nav-icon {
+            font-size: 1.1rem;
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar .logout {
+            padding: 15px 24px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.10);
+            margin-top: 10px;
+        }
+
+        .sidebar .logout a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 10px 0;
+        }
+
+        .sidebar .logout a:hover {
+            color: #fff;
+        }
+
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 25px 35px;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .topbar h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a2a3a;
+        }
+
+        .topbar .subtitle {
+            font-size: 0.9rem;
+            color: #6a7b8c;
+            margin-top: 2px;
+        }
+
+        .btn-add-user {
+            background: #2e7d32;
+            color: #fff;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-add-user:hover {
+            background: #1a5e20;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid #dce3ec;
+            margin-bottom: 25px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #7a8b9c;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            color: #2e7d32;
+        }
+
+        .tab.active {
+            color: #1a2a3a;
+            border-bottom-color: #2e7d32;
+        }
+
+        .tab .tab-icon {
+            font-size: 1rem;
+        }
+
+        /* ===== TARJETAS DE ESTADÍSTICAS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.78rem;
+            color: #7a8b9c;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-desc {
+            font-size: 0.82rem;
+            color: #7a8b9c;
+        }
+
+        /* ===== TABLA ===== */
+        .table-container {
+            background: #fff;
+            border-radius: 14px;
+            padding: 5px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        table th {
+            text-align: left;
+            font-size: 0.72rem;
+            color: #7a8b9c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f4f0;
+            font-weight: 700;
+        }
+
+        table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f4f0;
+            color: #1a2a3a;
+            vertical-align: middle;
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ===== ESTADO VACÍO ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aeba;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .empty-state .empty-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #7a8b9c;
+            margin-bottom: 4px;
+        }
+
+        .empty-state .empty-desc {
+            font-size: 0.85rem;
+            color: #a0aeba;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar .brand-text,
+            .sidebar nav a span:not(.nav-icon),
+            .sidebar .logout a span {
+                display: none;
+            }
+            .sidebar nav a {
+                justify-content: center;
+                padding: 12px;
+            }
+            .sidebar .brand {
+                justify-content: center;
+                padding: 0 0 20px;
+            }
+            .main-content {
+                margin-left: 70px;
+                padding: 20px 15px;
+            }
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .tabs {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">🌿</div>
+                <div class="brand-text">
+                    <h2>Jardinería</h2>
+                    <span>El Edén</span>
+                </div>
+            </div>
+
+            <nav>
+                <a href="dashboard.html">
+                    <span class="nav-icon">🏠</span>
+                    <span>Inicio</span>
+                </a>
+                <a href="inventario.html">
+                    <span class="nav-icon">📦</span>
+                    <span>Inventario</span>
+                </a>
+                <a href="alertas.html">
+                    <span class="nav-icon">🔔</span>
+                    <span>Alertas</span>
+                </a>
+                <a href="facturacion.html">
+                    <span class="nav-icon">🧾</span>
+                    <span>Facturación</span>
+                </a>
+                <a href="administracion.html" class="active">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Administración</span>
+                </a>
+            </nav>
+
+            <div class="logout">
+                <a href="login.html">
+                    <span class="nav-icon">🚪</span>
+                    <span>Cerrar sesión</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ===== CONTENIDO PRINCIPAL ===== -->
+        <main class="main-content">
+
+            <!-- Topbar -->
+            <div class="topbar">
+                <div>
+                    <h1>Administración del Sistema</h1>
+                    <div class="subtitle">0 usuarios activos · 0 roles definidos</div>
+                </div>
+                <button class="btn-add-user">
+                    + Agregar Usuario
+                </button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active">
+                    <span class="tab-icon">👥</span>
+                    Usuarios
+                </div>
+                <div class="tab">
+                    <span class="tab-icon">🛡️</span>
+                    Roles y Permisos
+                </div>
+                <div class="tab">
+                    <span class="tab-icon">⚙️</span>
+                    Configuración
+                </div>
+            </div>
+
+            <!-- Tarjetas de estadísticas (en 0) -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Usuarios Activos</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-desc">de 0 registrados</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Roles Definidos</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-desc">niveles de acceso</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Usuarios Inactivos</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-desc">sin acceso al sistema</div>
+                </div>
+            </div>
+
+            <!-- Tabla de usuarios (vacía) -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo Electrónico</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <div class="empty-icon">👥</div>
+                                    <div class="empty-title">No hay usuarios registrados</div>
+                                    <div class="empty-desc">Comienza agregando tu primer usuario al sistema</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>
