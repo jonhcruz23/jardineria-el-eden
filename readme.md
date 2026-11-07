@@ -1,67 +1,33 @@
-# Jardinería El Edén
+#  Jardinería El Edén - Sistema de Gestión
 
-Sistema de gestión para un negocio dedicado a la comercialización de plantas, flores y productos de jardinería.
+Sistema web integral diseñado para la administración de inventario, ventas y facturación de la empresa Jardinería El Edén.
 
-## Descripción
+## Descripción del Proyecto
+Este proyecto nace con el objetivo de digitalizar y optimizar los procesos operativos del negocio. Permite llevar un control estricto del stock de productos, gestionar las ventas a clientes, emitir facturas y generar alertas automáticas cuando los productos están por agotarse.
 
-"Jardinería El Edén" es un sistema web que permite gestionar el inventario, los clientes, la facturación y las alertas de stock de un negocio de jardinería. El proyecto está desarrollado con HTML, CSS, JavaScript y utiliza LocalStorage para la persistencia local de datos.
+##  Tecnologías Utilizadas
+El proyecto utiliza una arquitectura Cliente-Servidor (MVC):
 
-## Tecnologías Seleccionadas
+*   **Backend:** Node.js, Express.js
+*   **Base de Datos:** MongoDB (con Mongoose)
+*   **Frontend:** HTML5, CSS3, JavaScript
+*   **Seguridad:** bcrypt (encriptación de contraseñas) y JSON Web Tokens (JWT)
+*   **Control de versiones:** Git y GitHub
 
-### Backend
-- *Node.js* (18.x): Entorno de ejecución de JavaScript en el servidor.
-- *Express.js* (4.x): Framework para construir APIs REST.
-- *Mongoose* (7.x): ODM para MongoDB.
+##  Módulos Desarrollados
+El sistema está dividido en los siguientes módulos principales:
+1.  **Autenticación y Seguridad:** Login de usuarios con contraseñas encriptadas y control de acceso por roles (Administrador, Vendedor, Almacenista).
+2.  **Gestión de Inventario (CRUD):** Registro, actualización, eliminación y consulta de productos. Incluye alertas de stock mínimo.
+3.  **Ventas y Facturación:** Registro de ventas, cálculo automático de subtotales e IVA, y generación de historial de facturas.
+4.  **Dashboard:** Panel de control visual con estadísticas del negocio.
 
-### Base de Datos
-- *MongoDB* (8.x): Base de datos NoSQL documental.
-- *MongoDB Compass*: Interfaz gráfica para MongoDB.
+##  Estándares de Codificación Aplicados
+Para garantizar un código limpio, escalable y mantenible, se aplicaron las siguientes convenciones:
+*   **Variables y Funciones:** `camelCase` (ej. `nombreProducto`, `calcularTotal()`).
+*   **Clases y Modelos:** `PascalCase` (ej. `Producto`, `UsuarioModel`).
+*   **Constantes:** `UPPER_SNAKE_CASE` (ej. `IVA_PORCENTAJE`).
+*   **Booleanos:** Prefijos `is` o `has` (ej. `isActive`, `hasStock`).
+*   **Estructura Backend:** Separación de responsabilidades por carpetas (`controllers`, `models`, `routes`, `config`).
 
-### Frontend
-- *HTML5*: Estructura de las páginas.
-- *CSS3*: Diseño visual y responsive.
-- *JavaScript (ES6+)*: Interactividad y lógica del cliente.
-- *Bootstrap 5*: Framework CSS para diseño responsive.
+5. prueba final 
 
-### Librerías
-- *bcrypt*: Encriptación de contraseñas.
-- *jsonwebtoken (JWT)*: Autenticación y autorización.
-- *cors*: Permitir peticiones desde el frontend.
-- *dotenv*: Gestión de variables de entorno.
-
-## Módulos Funcionales
-
-| Módulo | Descripción |
-|--------|-------------|
-| *Login* | Inicio de sesión de usuarios con validación de credenciales. |
-| *Dashboard* | Panel de control con estadísticas del negocio. |
-| *Inventario* | Gestión de productos con CRUD y persistencia local. |
-| *Alertas* | Alertas de stock mínimo y crítico. |
-| *Facturación* | Registro y gestión de ventas con carrito dinámico. |
-| *Administración* | Gestión de usuarios y roles del sistema. |
-
-## Estándares de Codificación
-
-### Variables
-- *camelCase*: `nombreProducto`, `precioVenta`
-- *Constantes*: `UPPER_SNAKE_CASE` → `IVA_PORCENTAJE`
-- *Booleanos*: Prefijo `is` o `has` → `isActive`
-
-### Clases
-- *PascalCase*: `Producto`, `Factura`, `Cliente`
-
-### Métodos y Funciones
-- *camelCase + verbo*: `crearProducto()`, `calcularTotal()`
-- *Funciones privadas*: Prefijo `_` → `_validarDatos()`
-
-### Organización de Archivos
-
-
-## Autor
-
-**Jonh Alexander Cruz Nieto**  
-Tecnólogo en Análisis y Desarrollo de Software  
-SENA - Centro de Gestión de Mercados, Logística y Tecnologías de la Información  
-Agosto 2026
-
-Prueba de actualización remota
